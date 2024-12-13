@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Блог криптографа</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Подключаем Chart.js -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .blog-header {
+            background-color: #1a1a1a;
+            color: #00FF00;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .search-form {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border: 1px solid #00FF00;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .post-card {
+            background-color: #1a1a1a;
+            border: 1px solid #00FF00;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0px 2px 5px rgba(0, 255, 0, 0.1);
+        }
+
+        .post-card h2 {
+            color: #00FF00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .post-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .post-meta span {
+            color: #00FF00;
+        }
+
+        .post-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .form-control {
+            background-color: #333;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+        }
+
+        .form-control::placeholder {
+            color: #00FF00;
+        }
+
+        .btn-success {
+            background-color: #00FF00;
+            border-color: #00FF00;
+            color: #121212;
+        }
+
+        .btn-success:hover {
+            background-color: #009900;
+            border-color: #009900;
+        }
+
+        .chart-container {
+            margin-top: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Навигационное меню -->
+<header th:replace="navbar :: navbar"></header>
+
+<div class="container mt-5">
+    <div class="blog-header">
+        <h1>Добро пожаловать в блог криптографа</h1>
+    </div>
+
+    <!-- Форма поиска -->
+    <div class="search-form mt-4">
+        <form th:action="@{/blog/search}" method="get">
+            <div class="row gy-3">
+                <div class="col-md-4">
+                    <input type="text" name="title" class="form-control" placeholder="Название">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="content" class="form-control" placeholder="Текст">
+                </div>
+                <div class="col-md-4">
+                    <input type="date" name="date" class="form-control">
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success">Поиск</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Список записей -->
+    <div class="post-list mt-4">
+        <div th:each="post : ${posts}" class="post-card">
+            <h2 th:text="${post.title}"></h2>
+            <div class="post-meta">
+                <span>Дата: <span th:text="${post.publicationDate}"></span></span><br>
+                <span>Автор: <span th:text="${post.author.username}"></span></span>
+            </div>
+            <p th:text="${post.content}"></p>
+        </div>
+    </div>
+
+    <!-- Гистограмма с количеством постов по пользователям -->
+    <div class="chart-container">
+        <canvas id="postsChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Получаем данные для гистограммы
+    const postsCountByUser = /*[[${postsCountByUser}]]*/ []; // Передаем данные из контроллера
+
+    const labels = postsCountByUser.map(user => user[0]); // Имена пользователей
+    const data = postsCountByUser.map(user => user[1]); // Количество постов
+
+    const ctx = document.getElementById('postsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Количество постов',
+                data: data,
+                backgroundColor: '#00FF00',
+                borderColor: '#00FF00',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return tooltipItem.raw + ' постов';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
