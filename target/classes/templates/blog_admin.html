@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления блогом</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .navbar {
+            background-color: #1a1a1a;
+            border-bottom: 2px solid #00FF00;
+        }
+
+        .navbar-brand {
+            color: #00FF00;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .nav-link {
+            color: #00FF00;
+        }
+
+        .nav-link:hover {
+            color: #009900;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        h1, h2 {
+            color: #00FF00;
+            text-align: center;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .btn-primary {
+            background-color: #00FF00;
+            border-color: #00FF00;
+            color: #121212;
+        }
+
+        .btn-primary:hover {
+            background-color: #009900;
+            border-color: #009900;
+        }
+
+        .table {
+            background-color: #1a1a1a;
+            color: #00FF00;
+        }
+
+        .table th, .table td {
+            border: 1px solid #00FF00;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .table tr:hover {
+            background-color: #333;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            color: #00FF00;
+        }
+
+        .modal-header, .modal-footer {
+            border-bottom: 1px solid #00FF00;
+        }
+
+        .modal-body {
+            background-color: #333;
+        }
+
+        .modal-button {
+            background-color: #00FF00;
+            color: #121212;
+        }
+
+        .modal-button:hover {
+            background-color: #009900;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Навигационное меню -->
+<header th:replace="navbar :: navbar"></header>
+
+<!-- Основной контент -->
+<div class="container mt-5">
+    <h1>Панель управления блогом</h1>
+
+    <!-- Управление постами -->
+    <div class="bg-dark p-4 rounded-lg shadow">
+        <div class="d-flex justify-content-between mb-3">
+            <h2>Управление постами</h2>
+            <button id="openAddModal" class="btn btn-primary">Добавить запись</button>
+        </div>
+
+        <!-- Таблица записей -->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Дата</th>
+                <th>Автор</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post : ${posts}">
+                <td th:text="${post.id}"></td>
+                <td th:text="${post.title}"></td>
+                <td th:text="${post.publicationDate}"></td>
+                <td th:text="${post.author.username}"></td>
+                <td>
+                    <button class="btn btn-warning editButton" th:data-id="${post.id}" th:data-title="${post.title}" th:data-content="${post.content}">
+                        Редактировать
+                    </button>
+                    <a th:href="@{'/blog/admin/delete/' + ${post.id}}" class="btn btn-danger">Удалить</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления записи -->
+<div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Добавить новую запись</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/blog/admin/add}" method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название</label>
+                        <input type="text" id="title" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Текст</label>
+                        <textarea id="content" name="content" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary ms-2">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Скрипт для работы с модальными окнами -->
+<script>
+    document.getElementById("openAddModal").addEventListener("click", function() {
+        var addModal = new bootstrap.Modal(document.getElementById('addModal'));
+        addModal.show();
+    });
+</script>
+
+</body>
+</html>

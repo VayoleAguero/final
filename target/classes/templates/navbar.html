@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+        <div class="container">
+            <!-- Бренд -->
+            <a class="navbar-brand fw-bold" th:href="@{/}">Управление сообщениями</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Основное меню -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/blog}">Блог</a>
+                    </li>
+                    <!-- Ссылка на административную панель блога -->
+                    <li class="nav-item"
+                        th:if="${currentUser != null and (currentUser.roles.![name.toLowerCase()]?.contains('admin') or currentUser.roles.![name.toLowerCase()]?.contains('editor'))}">
+                        <a class="nav-link" th:href="@{/blog/admin}">Админ панель блога</a>
+                    </li>
+                    <!-- Ссылка на управление пользователями -->
+                    <li class="nav-item"
+                        th:if="${currentUser != null and currentUser.roles.![name.toLowerCase()]?.contains('admin')}">
+                        <a class="nav-link" th:href="@{/admin/users}">Управление пользователями</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Обо мне</a> <!-- Новый пункт меню -->
+                    </li>
+                </ul>
+
+                <!-- Правый блок -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Если пользователь авторизован -->
+                    <li class="nav-item dropdown" th:if="${currentUser != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false" th:text="'Привет, ' + ${currentUser.username}">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}">Мой профиль</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/logout}">Выход</a></li>
+                        </ul>
+                    </li>
+                    <!-- Если пользователь не авторизован -->
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" th:href="@{/login}">Вход</a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+</html>
