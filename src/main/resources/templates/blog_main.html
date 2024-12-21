@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Блог криптографа</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Подключаем Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             background-color: #121212;
@@ -89,16 +89,56 @@
     </style>
 </head>
 <body>
-
-<!-- Навигационное меню -->
-<header th:replace="navbar :: navbar"></header>
+<!-- Навбар с изменениями -->
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/}">Управление сообщениями</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/blog}">Блог</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <!-- Проверка авторизации -->
+                    <li class="nav-item dropdown" th:if="${currentUser != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false" th:text="'Привет, ' + ${currentUser.username}">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}">Мой профиль</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/logout}">Выход</a></li>
+                        </ul>
+                    </li>
+                    <!-- Кнопки для неавторизованных пользователей -->
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" th:href="@{/login}">Вход</a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
 
 <div class="container mt-5">
     <div class="blog-header">
         <h1>Добро пожаловать в блог криптографа</h1>
     </div>
 
-    <!-- Форма поиска -->
     <div class="search-form mt-4">
         <form th:action="@{/blog/search}" method="get">
             <div class="row gy-3">
@@ -118,7 +158,6 @@
         </form>
     </div>
 
-    <!-- Список записей -->
     <div class="post-list mt-4">
         <div th:each="post : ${posts}" class="post-card">
             <h2 th:text="${post.title}"></h2>
@@ -130,7 +169,6 @@
         </div>
     </div>
 
-    <!-- Гистограмма с количеством постов по пользователям -->
     <div class="chart-container">
         <canvas id="postsChart"></canvas>
     </div>
@@ -139,11 +177,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Получаем данные для гистограммы
-    const postsCountByUser = /*[[${postsCountByUser}]]*/ []; // Передаем данные из контроллера
-
-    const labels = postsCountByUser.map(user => user[0]); // Имена пользователей
-    const data = postsCountByUser.map(user => user[1]); // Количество постов
+    const postsCountByUser = /*[[${postsCountByUser}]]*/ [];
+    const labels = postsCountByUser.map(user => user[0]);
+    const data = postsCountByUser.map(user => parseInt(user[1]));
 
     const ctx = document.getElementById('postsChart').getContext('2d');
     new Chart(ctx, {
@@ -153,8 +189,8 @@
             datasets: [{
                 label: 'Количество постов',
                 data: data,
-                backgroundColor: '#00FF00',
-                borderColor: '#00FF00',
+                backgroundColor: 'rgba(0, 255, 0, 0.5)',
+                borderColor: 'rgba(0, 255, 0, 1)',
                 borderWidth: 1
             }]
         },

@@ -83,11 +83,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * Подсчитывает количество постов для каждого пользователя (автора).
      * <p>
      * Этот метод возвращает список массивов объектов, где каждый элемент массива представляет собой пару
-     * (пользователь, количество его постов).
+     * (имя пользователя, количество его постов).
      * </p>
      *
      * @return Список с подсчётом постов для каждого автора.
      */
-    @Query("SELECT p.author, COUNT(p) FROM Post p GROUP BY p.author")
+    @Query("SELECT p.author.username, COUNT(p) FROM Post p GROUP BY p.author.username")
     List<Object[]> countPostsByUser();
 }

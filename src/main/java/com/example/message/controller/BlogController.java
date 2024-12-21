@@ -15,10 +15,6 @@ import java.util.List;
 
 /**
  * Контроллер для отображения главной страницы блога и поиска постов.
- * <p>
- * Этот контроллер отвечает за отображение всех постов блога на главной странице и поиск постов по заголовку, содержимому
- * или дате публикации.
- * </p>
  */
 @Controller
 @RequestMapping("/blog")
@@ -33,45 +29,37 @@ public class BlogController {
 
     /**
      * Отображение главной страницы блога с перечнем всех постов и количеством постов для каждого пользователя.
-     * <p>
-     * Этот метод загружает все посты и добавляет их в модель, а также получает информацию о количестве постов для
-     * каждого пользователя.
-     * </p>
-     *
-     * @param model объект для добавления атрибутов на страницу.
-     * @return имя представления для главной страницы блога.
      */
     @GetMapping
     public String viewBlogMainPage(Model model) {
-        List<Post> posts = postService.getAllPosts(); // Получаем все посты
-        model.addAttribute("posts", posts); // Добавляем их в модель
+        List<Post> posts = postService.getAllPosts();
+        model.addAttribute("posts", posts);
 
-        // Получаем данные о количестве постов для каждого пользователя
+        // Получаем статистику постов по пользователям
         List<Object[]> postsCountByUser = postService.getPostsCountByUser();
-        model.addAttribute("postsCountByUser", postsCountByUser); // Добавляем в модель данные о пользователях
 
-        return "blog_main"; // Возвращаем имя представления для главной страницы блога
+        // Формируем массив для гистограммы
+        String dataForChart = postsCountByUser.stream()
+                .map(obj -> String.format("[\"%s\", %d]", obj[0].toString(), ((Number) obj[1]).intValue()))
+                .reduce((a, b) -> a + "," + b)
+                .map(s -> "[" + s + "]")
+                .orElse("[]");
+
+        model.addAttribute("postsCountByUser", dataForChart);
+
+        return "blog_main";
     }
 
     /**
      * Поиск постов по заголовку, содержимому или дате.
-     * <p>
-     * Этот метод обрабатывает поиск по указанным параметрам: заголовок, содержание или дата публикации.
-     * </p>
-     *
-     * @param title   заголовок для поиска.
-     * @param content содержимое для поиска.
-     * @param date    дата публикации для поиска.
-     * @param model   объект для добавления атрибутов на страницу.
-     * @return имя представления для главной страницы блога с результатами поиска.
      */
     @GetMapping("/search")
     public String searchPosts(@RequestParam(required = false) String title,
                               @RequestParam(required = false) String content,
                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                               Model model) {
-        List<Post> posts = postService.searchPosts(title, content, date); // Ищем посты с указанными параметрами
-        model.addAttribute("posts", posts); // Добавляем результаты поиска в модель
-        return "blog_main"; // Возвращаем имя представления для главной страницы блога с результатами поиска
+        List<Post> posts = postService.searchPosts(title, content, date);
+        model.addAttribute("posts", posts);
+        return "blog_main";
     }
 }

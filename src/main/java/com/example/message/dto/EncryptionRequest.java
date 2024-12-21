@@ -8,8 +8,19 @@ package com.example.message.dto;
  */
 public class EncryptionRequest {
 
+    /**
+     * Сообщение, которое требуется зашифровать.
+     */
     private String message;
+
+    /**
+     * Метод шифрования, который должен быть использован.
+     */
     private String encryptionMethod;
+
+    /**
+     * Ключ для шифрования.
+     */
     private String key;
 
     /**
@@ -33,7 +44,7 @@ public class EncryptionRequest {
     /**
      * Получить метод шифрования, который должен быть использован.
      *
-     * @return Метод шифрования (например, "XOR", "Salsa20").
+     * @return Метод шифрования (например, "RC4", "CHACHA20").
      */
     public String getEncryptionMethod() {
         return encryptionMethod;
@@ -42,7 +53,7 @@ public class EncryptionRequest {
     /**
      * Установить метод шифрования.
      *
-     * @param encryptionMethod Метод шифрования (например, "XOR", "Salsa20").
+     * @param encryptionMethod Метод шифрования (например, "RC4", "CHACHA20").
      */
     public void setEncryptionMethod(String encryptionMethod) {
         this.encryptionMethod = encryptionMethod;
@@ -64,5 +75,14 @@ public class EncryptionRequest {
      */
     public void setKey(String key) {
         this.key = key;
+    }
+
+    @Override
+    public String toString() {
+        return "EncryptionRequest{" +
+                "message='" + message + '\'' +
+                ", encryptionMethod='" + encryptionMethod + '\'' +
+                ", key='" + key + '\'' +
+                '}';
     }
 }

@@ -21,11 +21,6 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    /**
-     * Конструктор для инъекции зависимости {@link PostRepository}.
-     *
-     * @param postRepository Репозиторий для работы с постами.
-     */
     @Autowired
     public PostService(PostRepository postRepository) {
         this.postRepository = postRepository;

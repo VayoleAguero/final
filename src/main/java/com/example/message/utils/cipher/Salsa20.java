@@ -2,43 +2,36 @@ package com.example.message.utils.cipher;
 
 import org.bouncycastle.crypto.engines.Salsa20Engine;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
-/**
- * Класс для шифрования с использованием алгоритма Salsa20.
- * <p>
- * Этот класс реализует шифрование данных с использованием поточного шифра Salsa20.
- * Salsa20 является высокоскоростным симметричным шифром, который применяет операцию
- * потокового шифрования на основе заданного ключа и инициализационного вектора (IV).
- * </p>
- *
- * @see Salsa20Engine
- */
 public class Salsa20 {
 
     /**
      * Метод для шифрования данных с использованием алгоритма Salsa20.
-     * <p>
-     * Этот метод использует потоковый шифр Salsa20 для шифрования входных данных.
-     * Потоковый шифр применяет побитовую операцию XOR с использованием сгенерированного
-     * ключа и инициализационного вектора для каждого блока данных.
-     * </p>
      *
-     * @param input Входной массив байтов для шифрования.
-     * @param key Ключ для шифрования. Должен быть 256-битным (32 байта).
-     * @param nonce Инициализационный вектор для алгоритма Salsa20.
-     * @return Зашифрованный массив байтов.
+     * @param input Входные данные для шифрования.
+     * @param key   Ключ длиной 32 байта.
+     * @param nonce Вектор инициализации (IV) длиной 8 байт.
+     * @return Зашифрованные данные.
      */
     public static byte[] salsa20Encrypt(byte[] input, byte[] key, byte[] nonce) {
-        // Инициализируем движок Salsa20 с ключом
-        Salsa20Engine engine = new Salsa20Engine();
-        engine.init(true, new KeyParameter(key));
+        try {
+            // Проверяем длину ключа и nonce
+            if (key.length != 32) {
+                throw new IllegalArgumentException("Ключ должен быть длиной 32 байта (256 бит)");
+            }
+            if (nonce.length != 8) {
+                throw new IllegalArgumentException("Nonce должен быть длиной 8 байт");
+            }
 
-        // Массив для хранения зашифрованного вывода
-        byte[] output = new byte[input.length];
+            Salsa20Engine engine = new Salsa20Engine();
+            engine.init(true, new ParametersWithIV(new KeyParameter(key), nonce));
 
-        // Применяем процесс шифрования
-        engine.processBytes(input, 0, input.length, output, 0);
-
-        return output;
+            byte[] output = new byte[input.length];
+            engine.processBytes(input, 0, input.length, output, 0);
+            return output;
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка в Salsa20 шифровании", e);
+        }
     }
 }
